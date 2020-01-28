@@ -1,1 +1,4 @@
-# Human_Activity_Recognition_Using_Smartphones
+# Human Activity Recognition Using Smartphones  
+## The Course Project of *Getting and Cleaning Data*  
+
+
