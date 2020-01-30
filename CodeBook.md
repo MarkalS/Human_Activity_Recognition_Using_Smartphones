@@ -26,6 +26,8 @@ fBodyGyroMag
 fBodyGyroJerkMag
 (Triaxial siganals were collected in X, Y, and Z directions, separately).
 Only the mean and standard deviation of each variable were kept in the tidy data, and both the "mean" and "std" of each variable were average astimated by each subject and each activity.
+The data cleaning workflow is in the **ReadMe.md**.
+
 
 
 ## Refernce:  
