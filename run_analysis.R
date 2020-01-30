@@ -33,17 +33,28 @@ dbCombine$Label_Num <- lbCombine$V1
 # 3.Extracts only the measurements on the mean and standard deviation 
 #   for each measurement
 colnames(dbCombine)[1:561] <- featuresTB$V2
-colnames(dbCombine) <- gsub("\\(\\)", "", colnames(dbCombine))
-selectedNm <- grep("mean|std", featuresTB$V2)
+selectedNm <- grep("mean\\(\\)|std\\(\\)", featuresTB$V2)
 dbMeaStd <- dbCombine[, c(selectedNm, 562:564)]
+colnames(dbMeaStd) <- gsub("\\(\\)\\-|\\(\\)$", "", colnames(dbMeaStd))
 
 
 # 4.Uses descriptive activity names to name the activities in the data set
 # 5.Appropriately labels the data set with descriptive variable names
-dbMeaStd <- dbMeaStd %>% 
+# 6.From the data set in step 4, 
+#   creates a second, independent tidy data set 
+#   with the average of each variable for each activity and each subject
+dbRecords <- dbMeaStd %>% 
     mutate(ActivityLabel = activeLabel$V2[match(Label_Num, activeLabel$V1)]) %>% 
     select(-Label_Num) %>% 
-    gather("Feature_StatsType", "StatsResults", -Group, -Subjects, -ActivityLabel) %>% 
-    separate(Feature_StatsType, c("Feature", "StatsType"))
-    # print
+    gather("Var_StatsType", "StatsResults", -Group, -Subjects, -ActivityLabel) %>% 
+    separate(Var_StatsType, c("Var", "StatsType")) %>% 
+    group_by(Subjects, Var, StatsType, ActivityLabel)
 
+dbSummarize <- dbRecords %>% summarize(StatsResults = mean(StatsResults))
+dbTidy <- dbRecords %>% 
+    distinct(Subjects, Group, ActivityLabel, Var, StatsType) %>% 
+    left_join(dbSummarize, by = c("Subjects", "Var", "StatsType", "ActivityLabel"))
+
+
+# 7.Write the tidy data set
+write.table(dbTidy, "tidyDataHARUS.txt", row.names = F)
